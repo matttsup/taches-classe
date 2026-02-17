@@ -41,6 +41,7 @@ export default async function ClasseCalendrierPage({
     <div className="animate-fadeIn">
       <CalendrierView
         classeId={selectedClasse.id}
+        classeName={selectedClasse.name}
         eleves={eleves ?? []}
         taches={taches ?? []}
         assignments={assignments ?? []}

@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getJourType, isJourEcole } from "@/lib/calendrier-scolaire";
+import { ExportPDFButton } from "./ExportPDFButton";
+import { RotationAutomatiqueModal } from "./RotationAutomatiqueModal";
 
 type Eleve = { id: string; name: string };
 type Tache = { id: string; name: string };
@@ -48,11 +50,13 @@ function getMonthName(date: Date): string {
 
 export function CalendrierView({
   classeId,
+  classeName,
   eleves,
   taches,
   assignments,
 }: {
   classeId: string;
+  classeName: string;
   eleves: Eleve[];
   taches: Tache[];
   assignments: Assignment[];
@@ -60,6 +64,7 @@ export function CalendrierView({
   const router = useRouter();
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
   const [copying, setCopying] = useState(false);
+  const [showRotationModal, setShowRotationModal] = useState(false);
 
   function getWeekDates(offset = 0): Date[] {
     const today = new Date();
@@ -160,122 +165,150 @@ export function CalendrierView({
   }
 
   return (
-    <div className="rounded-[20px] bg-white p-6 shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b-2 border-gray-100 pb-6">
-        <div className="flex items-center gap-3">
-          <span className="text-3xl">📅</span>
-          <span className="text-3xl font-bold text-classe-purple">
-            {getMonthName(weekDates[0])} {weekDates[0].getFullYear()}
-          </span>
-        </div>
-        <div className="flex flex-wrap gap-3">
-          <button
-            type="button"
-            onClick={() => setCurrentWeekOffset((o) => o - 1)}
-            className="rounded-[12px] bg-classe-purple px-5 py-3 text-lg font-semibold text-white transition-transform hover:scale-105"
-          >
-            ← Précédent
-          </button>
-          <button
-            type="button"
-            onClick={() => setCurrentWeekOffset((o) => o + 1)}
-            className="rounded-[12px] bg-classe-purple px-5 py-3 text-lg font-semibold text-white transition-transform hover:scale-105"
-          >
-            Suivant →
-          </button>
-          <button
-            type="button"
-            onClick={copyMondayToWeek}
-            disabled={copying}
-            className="rounded-[12px] bg-classe-teal px-5 py-3 text-lg font-semibold text-white transition-transform hover:scale-105 disabled:opacity-50"
-          >
-            {copying ? "Copie..." : "📋 Copier lundi → semaine"}
-          </button>
-        </div>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {weekDates.map((date, dayIndex) => {
-          const dateKey = formatDate(date);
-          const isToday = dateKey === today;
-          const jourType = getJourType(dateKey);
-          const isNonEcole = jourType !== "normal";
-
-          let bgColor = "bg-gray-50";
-          let borderColor = "";
-          let label = "";
-
-          if (isToday && !isNonEcole) {
-            bgColor = "bg-[#FFF9E3]";
-            borderColor = "border-[#FFD93D] border-3";
-          } else if (isNonEcole) {
-            bgColor = "bg-gray-200";
-            if (jourType === "pedago") label = "Pédago";
-            else if (jourType === "conge") label = "Congé";
-            else if (jourType === "relache") label = "Relâche";
-          }
-
-          return (
-            <div
-              key={dateKey}
-              className={`rounded-[15px] p-4 ${bgColor} ${borderColor} ${
-                isNonEcole ? "opacity-60" : ""
-              }`}
+    <>
+      <div className="rounded-[20px] bg-white p-6 shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b-2 border-gray-100 pb-6">
+          <div className="flex items-center gap-3">
+            <span className="text-3xl">📅</span>
+            <span className="text-3xl font-bold text-classe-purple">
+              {getMonthName(weekDates[0])} {weekDates[0].getFullYear()}
+            </span>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => setCurrentWeekOffset((o) => o - 1)}
+              className="rounded-[12px] bg-classe-purple px-5 py-3 text-lg font-semibold text-white transition-transform hover:scale-105"
             >
-              <div className="mb-4 border-b-2 border-gray-200 pb-3 text-center">
-                <div className="text-lg font-bold text-classe-purple">
-                  {date.toLocaleDateString("fr-FR", { weekday: "short" })}
+              ← Précédent
+            </button>
+            <button
+              type="button"
+              onClick={() => setCurrentWeekOffset((o) => o + 1)}
+              className="rounded-[12px] bg-classe-purple px-5 py-3 text-lg font-semibold text-white transition-transform hover:scale-105"
+            >
+              Suivant →
+            </button>
+            <button
+              type="button"
+              onClick={copyMondayToWeek}
+              disabled={copying}
+              className="rounded-[12px] bg-classe-teal px-5 py-3 text-lg font-semibold text-white transition-transform hover:scale-105 disabled:opacity-50"
+            >
+              {copying ? "Copie..." : "📋 Copier lundi → semaine"}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowRotationModal(true)}
+              disabled={eleves.length === 0}
+              className="rounded-[12px] bg-gradient-to-r from-classe-yellow to-classe-coral px-5 py-3 text-lg font-semibold text-white transition-transform hover:scale-105 disabled:opacity-50"
+            >
+              🔄 Rotation auto
+            </button>
+            <ExportPDFButton
+              weekDates={weekDates}
+              eleves={eleves}
+              taches={taches}
+              assignments={assignments}
+              classeName={classeName}
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {weekDates.map((date, dayIndex) => {
+            const dateKey = formatDate(date);
+            const isToday = dateKey === today;
+            const jourType = getJourType(dateKey);
+            const isNonEcole = jourType !== "normal";
+
+            let bgColor = "bg-gray-50";
+            let borderColor = "";
+            let label = "";
+
+            if (isToday && !isNonEcole) {
+              bgColor = "bg-[#FFF9E3]";
+              borderColor = "border-[#FFD93D] border-3";
+            } else if (isNonEcole) {
+              bgColor = "bg-gray-200";
+              if (jourType === "pedago") label = "Pédago";
+              else if (jourType === "conge") label = "Congé";
+              else if (jourType === "relache") label = "Relâche";
+            }
+
+            return (
+              <div
+                key={dateKey}
+                className={`rounded-[15px] p-4 ${bgColor} ${borderColor} ${
+                  isNonEcole ? "opacity-60" : ""
+                }`}
+              >
+                <div className="mb-4 border-b-2 border-gray-200 pb-3 text-center">
+                  <div className="text-lg font-bold text-classe-purple">
+                    {date.toLocaleDateString("fr-FR", { weekday: "short" })}
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900">{date.getDate()}</div>
+                  {label && (
+                    <div className="mt-1 text-xs font-semibold text-red-600">{label}</div>
+                  )}
                 </div>
-                <div className="text-2xl font-bold text-gray-900">{date.getDate()}</div>
-                {label && (
-                  <div className="mt-1 text-xs font-semibold text-red-600">{label}</div>
+
+                {!isNonEcole && (
+                  <div className="space-y-3">
+                    {taches.map((tache, tacheIndex) => {
+                      const assign = getAssignment(dateKey, tache.id);
+                      const key = `${dateKey}-${tache.id}`;
+                      const isBusy = loading === key;
+                      const color = TACHE_COLORS[tacheIndex % TACHE_COLORS.length];
+
+                      return (
+                        <div key={tache.id} className="space-y-1">
+                          <div className="text-xs font-semibold" style={{ color }}>
+                            {tache.name}
+                          </div>
+                          <select
+                            value={assign?.eleve_id ?? ""}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              if (v) setAssignment(dateKey, tache.id, v);
+                            }}
+                            disabled={isBusy || eleves.length === 0}
+                            className={`w-full rounded-[8px] border-2 px-2 py-2 text-xs font-semibold ${
+                              assign?.eleve_id ? "text-white" : "bg-white text-gray-700"
+                            }`}
+                            style={{
+                              borderColor: color,
+                              background: assign?.eleve_id ? color : "white",
+                            }}
+                          >
+                            <option value="">Choisir...</option>
+                            {eleves.map((e) => (
+                              <option key={e.id} value={e.id}>
+                                {e.name}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      );
+                    })}
+                  </div>
                 )}
               </div>
-
-              {!isNonEcole && (
-                <div className="space-y-3">
-                  {taches.map((tache, tacheIndex) => {
-                    const assign = getAssignment(dateKey, tache.id);
-                    const key = `${dateKey}-${tache.id}`;
-                    const isBusy = loading === key;
-                    const color = TACHE_COLORS[tacheIndex % TACHE_COLORS.length];
-
-                    return (
-                      <div key={tache.id} className="space-y-1">
-                        <div className="text-xs font-semibold" style={{ color }}>
-                          {tache.name}
-                        </div>
-                        <select
-                          value={assign?.eleve_id ?? ""}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            if (v) setAssignment(dateKey, tache.id, v);
-                          }}
-                          disabled={isBusy || eleves.length === 0}
-                          className={`w-full rounded-[8px] border-2 px-2 py-2 text-xs font-semibold ${
-                            assign?.eleve_id ? "text-white" : "bg-white text-gray-700"
-                          }`}
-                          style={{
-                            borderColor: color,
-                            background: assign?.eleve_id ? color : "white",
-                          }}
-                        >
-                          <option value="">Choisir...</option>
-                          {eleves.map((e) => (
-                            <option key={e.id} value={e.id}>
-                              {e.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
-    </div>
+
+      {showRotationModal && (
+        <RotationAutomatiqueModal
+          classeId={classeId}
+          weekDates={weekDates}
+          eleves={eleves}
+          taches={taches}
+          onClose={() => setShowRotationModal(false)}
+          onApply={() => setShowRotationModal(false)}
+        />
+      )}
+    </>
   );
 }

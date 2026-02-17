@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import Link from "next/link";
 import { getActiveClasse, getOrCreateFirstProf } from "@/lib/classe-active";
 import { ClasseSelector } from "@/components/classe/ClasseSelector";
+import { ThemeSelector } from "@/components/classe/ThemeSelector";
 
 export default async function ClasseProfDashboardPage({
   searchParams,
@@ -86,12 +87,16 @@ export default async function ClasseProfDashboardPage({
           Classe en cours : <span className="text-classe-teal">{selectedClasse.name}</span>
         </div>
         <ClasseSelector classes={classes} selectedClasseId={selectedClasse.id} />
-        <Link
-          href="/classe/prof/classes"
-          className="mt-6 inline-block rounded-[15px] bg-classe-purple/10 px-5 py-2 text-sm font-semibold text-classe-purple transition-transform hover:scale-105"
-        >
-          Gérer les classes
-        </Link>
+        
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
+          <ThemeSelector />
+          <Link
+            href="/classe/prof/classes"
+            className="inline-block rounded-[15px] bg-classe-purple/10 px-5 py-2 text-sm font-semibold text-classe-purple transition-transform hover:scale-105"
+          >
+            🏫 Gérer les classes
+          </Link>
+        </div>
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

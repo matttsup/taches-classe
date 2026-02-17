@@ -13,13 +13,8 @@ export default async function ClasseProfLayout({
 
   return (
     <div className="min-h-screen bg-[#F0F2F5] p-5">
-      <ClasseNavbar
-        classes={classes}
-        activeClasseId={classe?.id ?? null}
-      />
-      <main className="mx-auto max-w-[1400px]">
-        {children}
-      </main>
+      <ClasseNavbar classes={classes} activeClasseId={classe?.id ?? null} />
+      <main className="mx-auto max-w-[1400px]">{children}</main>
     </div>
   );
 }
