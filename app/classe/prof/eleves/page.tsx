@@ -21,10 +21,24 @@ export default async function ClasseElevesPage({
 
   const { data: eleves } = await supabase
     .from("classe_eleves")
-    .select("id, name, user_id, display_order")
+    .select("id, name, user_id, display_order, points, badges")
     .eq("classe_id", selectedClasse.id)
     .order("display_order", { ascending: true })
     .order("name", { ascending: true });
+
+  // Compter les tâches par élève
+  const { data: assignments } = await supabase
+    .from("classe_assignments")
+    .select("eleve_id")
+    .eq("classe_id", selectedClasse.id);
+
+  const elevesWithStats = (eleves ?? []).map((eleve) => {
+    const tachesCount = (assignments ?? []).filter((a) => a.eleve_id === eleve.id).length;
+    return {
+      ...eleve,
+      totalTaches: tachesCount,
+    };
+  });
 
   return (
     <div className="animate-fadeIn space-y-6">
@@ -44,7 +58,7 @@ export default async function ClasseElevesPage({
         <AddEleveForm classeId={selectedClasse.id} />
 
         <div className="mt-6">
-          <ElevesList eleves={eleves ?? []} classeId={selectedClasse.id} />
+          <ElevesList eleves={elevesWithStats} classeId={selectedClasse.id} />
         </div>
       </div>
     </div>
