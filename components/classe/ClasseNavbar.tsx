@@ -28,22 +28,14 @@ export function ClasseNavbar({ classes, activeClasseId }: ClasseNavbarProps) {
     <nav className="mb-5">
       <div className="mx-auto max-w-[1400px] px-5">
         <div className="rounded-[25px] bg-white p-6 shadow-[0_8px_25px_rgba(0,0,0,0.1)]">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="animate-float text-5xl">🏫</div>
-              <div>
-                <h1 className="text-3xl font-bold text-classe-purple">
-                  École Chanoine-Joseph-Théorêt
-                </h1>
-                <p className="text-base text-gray-400">Gestion des tâches de classe</p>
-              </div>
+          <div className="flex items-center gap-4">
+            <div className="animate-float text-5xl">🏫</div>
+            <div>
+              <h1 className="text-3xl font-bold text-classe-purple">
+                École Chanoine-Joseph-Théorêt
+              </h1>
+              <p className="text-base text-gray-400">Gestion des tâches de classe</p>
             </div>
-            <Link
-              href="/"
-              className="rounded-[15px] bg-[#FF6B9D] px-5 py-3 text-base font-semibold text-white transition-transform hover:scale-105"
-            >
-              Déconnexion
-            </Link>
           </div>
           <div className="mt-5 flex flex-wrap gap-3 border-t border-gray-100 pt-5">
             {navItems.map((item) => {
