@@ -21,6 +21,7 @@ export function ClasseNavbar({ classes, activeClasseId }: ClasseNavbarProps) {
     { href: `${basePath}/eleves`, label: "Élèves", emoji: "👥" },
     { href: `${basePath}/taches`, label: "Tâches", emoji: "✓" },
     { href: `${basePath}/calendrier`, label: "Calendrier", emoji: "📅" },
+    { href: `${basePath}/stats`, label: "Statistiques", emoji: "📊" },
     { href: `${basePath}/classes`, label: "Classes", emoji: "🏫" },
   ];
 
