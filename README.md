@@ -15,50 +15,19 @@ cd taches-classe
 npm install
 ```
 
-### 3. **IMPORTANT** : Configurer les variables d'environnement
-
-Créez un fichier `.env.local` à la racine du projet :
-
-```bash
-NEXT_PUBLIC_SUPABASE_URL=https://votre-projet.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=votre-cle-anon-ici
-```
-
-**Où trouver ces valeurs ?**
-1. Connectez-vous à [Supabase](https://supabase.com)
-2. Ouvrez votre projet
-3. Allez dans **Settings** > **API**
-4. Copiez :
-   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
-   - **anon public** key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-
-⚠️ **Sans ces variables, l'application ne fonctionnera pas !**
-
-### 4. Lancer l'application
+### 3. Lancer l'application
 ```bash
 npm run dev
 ```
 
 L'application sera accessible sur http://localhost:3000
 
-## 🐛 Résolution des erreurs courantes
-
-### Erreur: "application error: a server-side exception has occurred"
-
-**Cause**: Le fichier `.env.local` est manquant ou mal configuré.
-
-**Solution**: 
-1. Vérifiez que le fichier `.env.local` existe à la racine du projet
-2. Vérifiez que les variables `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY` sont correctement définies
-3. Redémarrez le serveur de développement (`Ctrl+C` puis `npm run dev`)
+✅ **Aucune configuration nécessaire !** Les credentials Supabase sont hardcodés dans le code.
 
 ## 📦 Déploiement sur Vercel
 
 1. Importez le projet sur Vercel
-2. Dans les paramètres du projet, ajoutez les variables d'environnement :
-   - `NEXT_PUBLIC_SUPABASE_URL`
-   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-3. Déployez !
+2. Déployez directement - aucune variable d'environnement à configurer !
 
 ## 📝 Fonctionnalités
 
@@ -77,3 +46,7 @@ L'application sera accessible sur http://localhost:3000
 - **Supabase** (Base de données PostgreSQL)
 - **Tailwind CSS** (Styling)
 - **TypeScript**
+
+## 🔒 Configuration Supabase
+
+Les credentials Supabase sont configurés dans `lib/supabase/config.ts`. Si vous souhaitez utiliser votre propre projet Supabase, modifiez ce fichier avec vos credentials (disponibles dans Supabase Dashboard > Settings > API).

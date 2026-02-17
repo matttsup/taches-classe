@@ -1,22 +1,22 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import { getSupabaseUrl, getSupabaseAnonKey } from "./config";
 
 export async function createClient() {
   const cookieStore = await cookies();
+  const supabaseUrl = getSupabaseUrl();
+  const supabaseAnonKey = getSupabaseAnonKey();
 
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (!supabaseUrl || !supabaseAnonKey) {
     throw new Error(
-      '❌ Variables d\'environnement Supabase manquantes!\n\n' +
-      'Créez un fichier .env.local à la racine du projet avec:\n' +
-      'NEXT_PUBLIC_SUPABASE_URL=https://votre-projet.supabase.co\n' +
-      'NEXT_PUBLIC_SUPABASE_ANON_KEY=votre-cle-anon\n\n' +
-      'Vous trouverez ces valeurs dans: Supabase Dashboard > Settings > API'
+      '❌ Configuration Supabase manquante!\n\n' +
+      'Les credentials Supabase doivent être définis dans lib/supabase/config.ts'
     );
   }
 
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {
