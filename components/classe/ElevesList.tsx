@@ -8,8 +8,6 @@ type Eleve = {
   name: string;
   user_id: string | null;
   display_order: number;
-  points?: number;
-  badges?: string[] | null;
   totalTaches?: number;
 };
 
@@ -59,9 +57,6 @@ export function ElevesList({ eleves, classeId }: { eleves: Eleve[]; classeId: st
               <div className="text-sm font-medium">
                 📋 {eleve.totalTaches || 0} tâche{(eleve.totalTaches || 0) !== 1 ? "s" : ""}
               </div>
-              {(eleve.points || 0) > 0 && (
-                <div className="mt-1 text-xs">⭐ {eleve.points} points</div>
-              )}
             </div>
 
             <DeleteEleveButton

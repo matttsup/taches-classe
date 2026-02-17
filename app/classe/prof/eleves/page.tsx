@@ -19,15 +19,12 @@ export default async function ClasseElevesPage({
     return <div>Aucune classe trouvée</div>;
   }
 
-  // Sélectionner seulement les colonnes qui existent toujours
   const { data: eleves } = await supabase
     .from("classe_eleves")
     .select("id, name, user_id, display_order")
     .eq("classe_id", selectedClasse.id)
     .order("display_order", { ascending: true })
     .order("name", { ascending: true });
-
-  console.log("Élèves trouvés:", eleves); // Pour debug
 
   // Compter les tâches par élève
   const { data: assignments } = await supabase
@@ -39,8 +36,6 @@ export default async function ClasseElevesPage({
     const tachesCount = (assignments ?? []).filter((a) => a.eleve_id === eleve.id).length;
     return {
       ...eleve,
-      points: 0,
-      badges: null,
       totalTaches: tachesCount,
     };
   });
