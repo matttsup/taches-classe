@@ -1,45 +1,79 @@
-# Répartition des tâches — Classe primaire
+# 🏫 Tâches Classe - École Chanoine-Joseph-Théorêt
 
-Application dédiée à la répartition des tâches dans une classe de primaire (balai, ranger les chaises, collation, etc.) avec un calendrier jour par jour.
+Application de gestion des tâches de classe pour enseignants.
 
-- **Enseignant** : créer une classe, gérer les élèves et les tâches, remplir le calendrier.
-- **Élève** : rejoindre une classe avec un code, voir ses tâches à venir.
+## 🚀 Installation sur un nouveau PC
 
-## Stack
-
-- Next.js 14, React, TypeScript, Tailwind CSS
-- Supabase (auth + base de données)
-- Déploiement : Vercel + GitHub
-
-## Installation
-
+### 1. Cloner le projet
 ```bash
-npm install
-cp .env.local.example .env.local
+git clone https://github.com/matttsup/taches-classe.git
+cd taches-classe
 ```
 
-Renseignez dans `.env.local` votre URL et clé anon Supabase.
+### 2. Installer les dépendances
+```bash
+npm install
+```
 
-## Base de données
+### 3. **IMPORTANT** : Configurer les variables d'environnement
 
-Créez un **projet Supabase dédié** pour cette app (séparé de l’app hockey). Dans le SQL Editor, exécutez le contenu de :
+Créez un fichier `.env.local` à la racine du projet :
 
-`supabase/migrations/00001_initial_schema.sql`
+```bash
+NEXT_PUBLIC_SUPABASE_URL=https://votre-projet.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=votre-cle-anon-ici
+```
 
-Configurez dans Supabase Authentication les URLs de redirection (Site URL et Redirect URLs pour votre domaine Vercel et `http://localhost:3000` en dev).
+**Où trouver ces valeurs ?**
+1. Connectez-vous à [Supabase](https://supabase.com)
+2. Ouvrez votre projet
+3. Allez dans **Settings** > **API**
+4. Copiez :
+   - **Project URL** → `NEXT_PUBLIC_SUPABASE_URL`
+   - **anon public** key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
 
-## Développement
+⚠️ **Sans ces variables, l'application ne fonctionnera pas !**
 
+### 4. Lancer l'application
 ```bash
 npm run dev
 ```
 
-Ouvrez [http://localhost:3000](http://localhost:3000).
+L'application sera accessible sur http://localhost:3000
 
-## Déploiement (Vercel + GitHub)
+## 🐛 Résolution des erreurs courantes
 
-1. Créez un **nouveau dépôt GitHub** pour ce projet.
-2. Poussez le code : `git init && git add . && git commit -m "Initial" && git remote add origin <url> && git push -u origin main`
-3. Sur [vercel.com](https://vercel.com), importez ce dépôt.
-4. Ajoutez les variables d’environnement : `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-5. Déployez. Puis dans Supabase, ajoutez l’URL Vercel en Site URL et en Redirect URL (`https://votre-app.vercel.app/auth/callback`).
+### Erreur: "application error: a server-side exception has occurred"
+
+**Cause**: Le fichier `.env.local` est manquant ou mal configuré.
+
+**Solution**: 
+1. Vérifiez que le fichier `.env.local` existe à la racine du projet
+2. Vérifiez que les variables `NEXT_PUBLIC_SUPABASE_URL` et `NEXT_PUBLIC_SUPABASE_ANON_KEY` sont correctement définies
+3. Redémarrez le serveur de développement (`Ctrl+C` puis `npm run dev`)
+
+## 📦 Déploiement sur Vercel
+
+1. Importez le projet sur Vercel
+2. Dans les paramètres du projet, ajoutez les variables d'environnement :
+   - `NEXT_PUBLIC_SUPABASE_URL`
+   - `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+3. Déployez !
+
+## 📝 Fonctionnalités
+
+- ✅ Gestion des élèves
+- ✅ Gestion des tâches
+- ✅ Calendrier d'assignation des tâches
+- ✅ Multi-classes
+- ✅ Médailles automatiques (🥇🥈🥉)
+- ✅ Export PDF du calendrier
+- ✅ Rotation automatique des tâches
+- ✅ Intégration du calendrier scolaire (congés, pédago, relâche)
+
+## 🔧 Technologies
+
+- **Next.js 14** (App Router)
+- **Supabase** (Base de données PostgreSQL)
+- **Tailwind CSS** (Styling)
+- **TypeScript**
