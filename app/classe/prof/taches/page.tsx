@@ -1,18 +1,29 @@
 import { createClient } from "@/lib/supabase/server";
-import { getOrCreateFirstClasse, getOrCreateFirstProf } from "@/lib/classe-active";
+import { getActiveClasse, getOrCreateFirstProf } from "@/lib/classe-active";
 import { TachesList } from "@/components/classe/TachesList";
 import { AddTacheForm } from "@/components/classe/AddTacheForm";
 import { SeedDefaultTaches } from "@/components/classe/SeedDefaultTaches";
 
-export default async function ClasseTachesPage() {
+export default async function ClasseTachesPage({
+  searchParams,
+}: {
+  searchParams: { classe?: string };
+}) {
   const supabase = await createClient();
   const prof = await getOrCreateFirstProf(supabase);
-  const { classe } = await getOrCreateFirstClasse(supabase, prof.id);
+  const { classe, classes } = await getActiveClasse(supabase, prof.id);
+
+  const selectedClasseId = searchParams.classe || classe?.id;
+  const selectedClasse = classes.find((c) => c.id === selectedClasseId) || classe;
+
+  if (!selectedClasse) {
+    return <div>Aucune classe trouvée</div>;
+  }
 
   const { data: taches } = await supabase
     .from("classe_taches")
     .select("id, name, display_order")
-    .eq("classe_id", classe.id)
+    .eq("classe_id", selectedClasse.id)
     .order("display_order", { ascending: true })
     .order("name", { ascending: true });
 
@@ -26,19 +37,19 @@ export default async function ClasseTachesPage() {
               Tâches ({taches?.length ?? 0})
             </h1>
             <p className="mt-1 text-lg text-gray-400">
-              Définis les tâches à répartir (balai, chaises, collation…)
+              Définis les tâches pour {selectedClasse.name}
             </p>
           </div>
         </div>
 
         {(!taches || taches.length === 0) && (
-          <SeedDefaultTaches classeId={classe.id} />
+          <SeedDefaultTaches classeId={selectedClasse.id} />
         )}
 
-        <AddTacheForm classeId={classe.id} />
+        <AddTacheForm classeId={selectedClasse.id} />
 
         <div className="mt-6">
-          <TachesList taches={taches ?? []} classeId={classe.id} />
+          <TachesList taches={taches ?? []} classeId={selectedClasse.id} />
         </div>
       </div>
     </div>

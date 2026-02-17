@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { getJourType, isJourEcole } from "@/lib/calendrier-scolaire";
 
 type Eleve = { id: string; name: string };
 type Tache = { id: string; name: string };
@@ -58,6 +59,7 @@ export function CalendrierView({
 }) {
   const router = useRouter();
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
+  const [copying, setCopying] = useState(false);
 
   function getWeekDates(offset = 0): Date[] {
     const today = new Date();
@@ -100,6 +102,52 @@ export function CalendrierView({
     router.refresh();
   }
 
+  async function copyMondayToWeek() {
+    if (!confirm("Copier les tâches du lundi sur toute la semaine ?")) return;
+
+    setCopying(true);
+    const supabase = createClient();
+    const mondayDate = formatDate(weekDates[0]);
+
+    // Récupérer les assignations du lundi
+    const mondayAssignments: { [key: string]: string } = {};
+    taches.forEach((tache) => {
+      const assign = getAssignment(mondayDate, tache.id);
+      if (assign) {
+        mondayAssignments[tache.id] = assign.eleve_id;
+      }
+    });
+
+    // Copier sur les autres jours (mardi à vendredi)
+    for (let i = 1; i < 5; i++) {
+      const dayDate = formatDate(weekDates[i]);
+      if (!isJourEcole(dayDate)) continue; // Skip non-école days
+
+      for (const tache of taches) {
+        const eleveId = mondayAssignments[tache.id];
+        if (!eleveId) continue;
+
+        const existing = getAssignment(dayDate, tache.id);
+        if (existing) {
+          await supabase
+            .from("classe_assignments")
+            .update({ eleve_id: eleveId })
+            .eq("id", existing.id);
+        } else {
+          await supabase.from("classe_assignments").insert({
+            classe_id: classeId,
+            assignment_date: dayDate,
+            tache_id: tache.id,
+            eleve_id: eleveId,
+          });
+        }
+      }
+    }
+
+    setCopying(false);
+    router.refresh();
+  }
+
   if (taches.length === 0) {
     return (
       <div className="rounded-[25px] bg-gradient-to-br from-classe-yellow to-classe-coral p-8 text-center text-white">
@@ -120,7 +168,7 @@ export function CalendrierView({
             {getMonthName(weekDates[0])} {weekDates[0].getFullYear()}
           </span>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button
             type="button"
             onClick={() => setCurrentWeekOffset((o) => o - 1)}
@@ -135,6 +183,14 @@ export function CalendrierView({
           >
             Suivant →
           </button>
+          <button
+            type="button"
+            onClick={copyMondayToWeek}
+            disabled={copying}
+            className="rounded-[12px] bg-classe-teal px-5 py-3 text-lg font-semibold text-white transition-transform hover:scale-105 disabled:opacity-50"
+          >
+            {copying ? "Copie..." : "📋 Copier lundi → semaine"}
+          </button>
         </div>
       </div>
 
@@ -142,12 +198,28 @@ export function CalendrierView({
         {weekDates.map((date, dayIndex) => {
           const dateKey = formatDate(date);
           const isToday = dateKey === today;
+          const jourType = getJourType(dateKey);
+          const isNonEcole = jourType !== "normal";
+
+          let bgColor = "bg-gray-50";
+          let borderColor = "";
+          let label = "";
+
+          if (isToday && !isNonEcole) {
+            bgColor = "bg-[#FFF9E3]";
+            borderColor = "border-[#FFD93D] border-3";
+          } else if (isNonEcole) {
+            bgColor = "bg-gray-200";
+            if (jourType === "pedago") label = "Pédago";
+            else if (jourType === "conge") label = "Congé";
+            else if (jourType === "relache") label = "Relâche";
+          }
 
           return (
             <div
               key={dateKey}
-              className={`rounded-[15px] p-4 ${
-                isToday ? "border-3 bg-[#FFF9E3] border-[#FFD93D]" : "bg-gray-50"
+              className={`rounded-[15px] p-4 ${bgColor} ${borderColor} ${
+                isNonEcole ? "opacity-60" : ""
               }`}
             >
               <div className="mb-4 border-b-2 border-gray-200 pb-3 text-center">
@@ -155,51 +227,51 @@ export function CalendrierView({
                   {date.toLocaleDateString("fr-FR", { weekday: "short" })}
                 </div>
                 <div className="text-2xl font-bold text-gray-900">{date.getDate()}</div>
+                {label && (
+                  <div className="mt-1 text-xs font-semibold text-red-600">{label}</div>
+                )}
               </div>
 
-              <div className="space-y-3">
-                {taches.map((tache, tacheIndex) => {
-                  const assign = getAssignment(dateKey, tache.id);
-                  const key = `${dateKey}-${tache.id}`;
-                  const isBusy = loading === key;
-                  const color = TACHE_COLORS[tacheIndex % TACHE_COLORS.length];
+              {!isNonEcole && (
+                <div className="space-y-3">
+                  {taches.map((tache, tacheIndex) => {
+                    const assign = getAssignment(dateKey, tache.id);
+                    const key = `${dateKey}-${tache.id}`;
+                    const isBusy = loading === key;
+                    const color = TACHE_COLORS[tacheIndex % TACHE_COLORS.length];
 
-                  return (
-                    <div key={tache.id} className="space-y-1">
-                      <div
-                        className="text-xs font-semibold"
-                        style={{ color }}
-                      >
-                        {tache.name}
+                    return (
+                      <div key={tache.id} className="space-y-1">
+                        <div className="text-xs font-semibold" style={{ color }}>
+                          {tache.name}
+                        </div>
+                        <select
+                          value={assign?.eleve_id ?? ""}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            if (v) setAssignment(dateKey, tache.id, v);
+                          }}
+                          disabled={isBusy || eleves.length === 0}
+                          className={`w-full rounded-[8px] border-2 px-2 py-2 text-xs font-semibold ${
+                            assign?.eleve_id ? "text-white" : "bg-white text-gray-700"
+                          }`}
+                          style={{
+                            borderColor: color,
+                            background: assign?.eleve_id ? color : "white",
+                          }}
+                        >
+                          <option value="">Choisir...</option>
+                          {eleves.map((e) => (
+                            <option key={e.id} value={e.id}>
+                              {e.name}
+                            </option>
+                          ))}
+                        </select>
                       </div>
-                      <select
-                        value={assign?.eleve_id ?? ""}
-                        onChange={(e) => {
-                          const v = e.target.value;
-                          if (v) setAssignment(dateKey, tache.id, v);
-                        }}
-                        disabled={isBusy || eleves.length === 0}
-                        className={`w-full rounded-[8px] border-2 px-2 py-2 text-xs font-semibold ${
-                          assign?.eleve_id
-                            ? "text-white"
-                            : "bg-white text-gray-700"
-                        }`}
-                        style={{
-                          borderColor: color,
-                          background: assign?.eleve_id ? color : "white",
-                        }}
-                      >
-                        <option value="">Choisir...</option>
-                        {eleves.map((e) => (
-                          <option key={e.id} value={e.id}>
-                            {e.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                  );
-                })}
-              </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           );
         })}

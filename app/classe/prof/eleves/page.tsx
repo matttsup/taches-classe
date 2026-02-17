@@ -1,17 +1,28 @@
 import { createClient } from "@/lib/supabase/server";
-import { getOrCreateFirstClasse, getOrCreateFirstProf } from "@/lib/classe-active";
+import { getActiveClasse, getOrCreateFirstProf } from "@/lib/classe-active";
 import { ElevesList } from "@/components/classe/ElevesList";
 import { AddEleveForm } from "@/components/classe/AddEleveForm";
 
-export default async function ClasseElevesPage() {
+export default async function ClasseElevesPage({
+  searchParams,
+}: {
+  searchParams: { classe?: string };
+}) {
   const supabase = await createClient();
   const prof = await getOrCreateFirstProf(supabase);
-  const { classe } = await getOrCreateFirstClasse(supabase, prof.id);
+  const { classe, classes } = await getActiveClasse(supabase, prof.id);
+
+  const selectedClasseId = searchParams.classe || classe?.id;
+  const selectedClasse = classes.find((c) => c.id === selectedClasseId) || classe;
+
+  if (!selectedClasse) {
+    return <div>Aucune classe trouvée</div>;
+  }
 
   const { data: eleves } = await supabase
     .from("classe_eleves")
     .select("id, name, user_id, display_order")
-    .eq("classe_id", classe.id)
+    .eq("classe_id", selectedClasse.id)
     .order("display_order", { ascending: true })
     .order("name", { ascending: true });
 
@@ -25,15 +36,15 @@ export default async function ClasseElevesPage() {
               Élèves ({eleves?.length ?? 0})
             </h1>
             <p className="mt-1 text-lg text-gray-400">
-              Ajoute les prénoms des élèves de ta classe
+              Ajoute les prénoms des élèves de {selectedClasse.name}
             </p>
           </div>
         </div>
 
-        <AddEleveForm classeId={classe.id} />
+        <AddEleveForm classeId={selectedClasse.id} />
 
         <div className="mt-6">
-          <ElevesList eleves={eleves ?? []} classeId={classe.id} />
+          <ElevesList eleves={eleves ?? []} classeId={selectedClasse.id} />
         </div>
       </div>
     </div>
