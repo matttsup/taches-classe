@@ -26,22 +26,21 @@ export function DeleteEleveButton({
 
   if (confirm) {
     return (
-      <span className="flex items-center gap-2 text-sm">
-        <span className="text-gray-600">Supprimer {eleveName} ?</span>
+      <div className="flex items-center justify-center gap-2">
         <button
           onClick={handleDelete}
           disabled={loading}
-          className="rounded bg-red-600 px-2 py-1 text-white hover:bg-red-700 disabled:opacity-50"
+          className="rounded-lg bg-white/30 px-3 py-1.5 text-sm font-semibold backdrop-blur-sm hover:bg-white/50 disabled:opacity-50"
         >
           Oui
         </button>
         <button
           onClick={() => setConfirm(false)}
-          className="rounded bg-gray-200 px-2 py-1 text-gray-700 hover:bg-gray-300"
+          className="rounded-lg bg-white/30 px-3 py-1.5 text-sm font-semibold backdrop-blur-sm hover:bg-white/50"
         >
           Non
         </button>
-      </span>
+      </div>
     );
   }
 
@@ -49,9 +48,9 @@ export function DeleteEleveButton({
     <button
       type="button"
       onClick={() => setConfirm(true)}
-      className="rounded text-sm text-red-600 hover:underline"
+      className="rounded-lg bg-white/30 px-3 py-1.5 text-sm font-semibold backdrop-blur-sm hover:bg-white/50"
     >
-      Supprimer
+      🗑️ Supprimer
     </button>
   );
 }

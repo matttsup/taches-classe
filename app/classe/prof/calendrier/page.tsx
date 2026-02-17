@@ -27,13 +27,20 @@ export default async function ClasseCalendrierPage() {
     .eq("classe_id", classe.id);
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-classe-green">
-        Calendrier des tâches
-      </h1>
-      <p className="text-lg text-gray-600">
-        Choisis un jour et assigne les tâches aux élèves.
-      </p>
+    <div className="animate-fadeIn">
+      <div className="mb-6 rounded-[25px] bg-white p-8 shadow-[0_8px_25px_rgba(0,0,0,0.1)]">
+        <div className="flex items-center gap-4">
+          <span className="text-5xl">📅</span>
+          <div>
+            <h1 className="text-4xl font-bold text-classe-purple">
+              Calendrier des tâches
+            </h1>
+            <p className="mt-1 text-lg text-gray-400">
+              Choisis un jour et assigne les tâches aux élèves
+            </p>
+          </div>
+        </div>
+      </div>
 
       <CalendrierView
         classeId={classe.id}

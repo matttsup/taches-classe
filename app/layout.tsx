@@ -1,15 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Nunito } from "next/font/google";
 import "./globals.css";
 
-const nunito = Nunito({
-  subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
-  variable: "--font-nunito",
-});
-
 export const metadata: Metadata = {
-  title: "Répartition des tâches — Classe primaire",
+  title: "Mes Tâches de Classe",
   description: "Gérez les tâches de la classe : balai, chaises, collation… Calendrier jour par jour.",
 };
 
@@ -25,10 +18,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="fr" className={nunito.variable}>
-      <body className="min-h-screen bg-classe-mint/40 font-sans text-lg antialiased">
-        {children}
-      </body>
+    <html lang="fr">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet" />
+      </head>
+      <body>{children}</body>
     </html>
   );
 }

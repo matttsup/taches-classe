@@ -8,20 +8,23 @@ const config: Config = {
   ],
   theme: {
     extend: {
-      fontFamily: {
-        sans: ["var(--font-nunito)", "system-ui", "sans-serif"],
-      },
       colors: {
         classe: {
-          green: "#0d9488",
-          mint: "#ccfbf1",
-          orange: "#f97316",
-          yellow: "#fbbf24",
+          purple: "#667eea",
+          darkPurple: "#764ba2",
+          pink: "#f093fb",
+          yellow: "#FFD93D",
+          coral: "#FF8B94",
+          teal: "#4ECDC4",
+          mintGreen: "#A8E6CF",
+          lightTeal: "#95E1D3",
         },
       },
-      borderRadius: {
-        "2xl": "1rem",
-        "3xl": "1.5rem",
+      animation: {
+        bounceIn: "bounceIn 0.8s ease-out",
+        float: "float 3s ease-in-out infinite",
+        slideIn: "slideIn 0.5s ease-out",
+        fadeIn: "fadeIn 0.3s ease-out",
       },
     },
   },

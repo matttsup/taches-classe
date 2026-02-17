@@ -19,68 +19,49 @@ export function ClasseNavbar({
   const navItems = [
     { href: basePath, label: "Tableau de bord", emoji: "🏠" },
     { href: `${basePath}/eleves`, label: "Élèves", emoji: "👥" },
-    { href: `${basePath}/taches`, label: "Tâches", emoji: "✅" },
+    { href: `${basePath}/taches`, label: "Tâches", emoji: "✓" },
     { href: `${basePath}/calendrier`, label: "Calendrier", emoji: "📅" },
   ];
 
   return (
-    <nav className="border-b-2 border-teal-200 bg-white shadow-sm">
-      <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex items-center gap-6">
-            <Link
-              href={basePath}
-              className="flex items-center gap-2 text-xl font-bold text-classe-green"
-            >
-              <span className="text-3xl">📋</span>
-              <span>Répartition des tâches</span>
-            </Link>
-            <div className="hidden gap-1 md:flex">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`rounded-xl px-4 py-2.5 text-base font-medium transition ${
-                    pathname === item.href
-                      ? "bg-classe-green/20 text-classe-green"
-                      : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-                  }`}
-                >
-                  <span className="mr-1.5">{item.emoji}</span>
-                  {item.label}
-                </Link>
-              ))}
+    <nav className="mb-5">
+      <div className="mx-auto max-w-[1400px] px-5">
+        <div className="rounded-[25px] bg-white p-6 shadow-[0_8px_25px_rgba(0,0,0,0.1)]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="animate-float text-4xl">⚙️</div>
+              <div>
+                <h1 className="text-3xl font-bold text-classe-purple">
+                  Gestion des Tâches - Mode Professeur
+                </h1>
+                <p className="text-base text-gray-400">
+                  Organisez les responsabilités de votre classe
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-4">
-            {activeClasseId && (
-              <span className="hidden text-base text-gray-500 sm:inline">
-                Classe : {classes.find((c) => c.id === activeClasseId)?.name ?? "—"}
-              </span>
-            )}
             <Link
               href="/"
-              className="rounded-xl px-3 py-2 text-base font-medium text-gray-600 hover:bg-gray-100 hover:text-classe-green"
+              className="rounded-[15px] bg-[#FF6B9D] px-5 py-3 text-base font-semibold text-white transition-transform hover:scale-105"
             >
-              Accueil
+              Déconnexion
             </Link>
           </div>
-        </div>
-        <div className="flex flex-col gap-1 border-t border-gray-100 py-3 md:hidden">
-          {navItems.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`rounded-xl px-4 py-2.5 text-base font-medium ${
-                pathname === item.href
-                  ? "bg-classe-green/20 text-classe-green"
-                  : "text-gray-600"
-              }`}
-            >
-              <span className="mr-1.5">{item.emoji}</span>
-              {item.label}
-            </Link>
-          ))}
+          <div className="mt-5 flex flex-wrap gap-3 border-t border-gray-100 pt-5">
+            {navItems.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`rounded-[15px] px-5 py-3 text-base font-semibold transition-all ${
+                  pathname === item.href
+                    ? "bg-classe-purple text-white shadow-lg"
+                    : "bg-gray-50 text-gray-700 hover:bg-gray-100"
+                }`}
+              >
+                <span className="mr-2">{item.emoji}</span>
+                {item.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </nav>

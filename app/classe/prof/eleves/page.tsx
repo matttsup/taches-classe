@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { getActiveClasse, getOrCreateFirstClasse, getOrCreateFirstProf } from "@/lib/classe-active";
+import { getOrCreateFirstClasse, getOrCreateFirstProf } from "@/lib/classe-active";
 import { ElevesList } from "@/components/classe/ElevesList";
 import { AddEleveForm } from "@/components/classe/AddEleveForm";
 
@@ -16,22 +16,25 @@ export default async function ClasseElevesPage() {
     .order("name", { ascending: true });
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-classe-green">Liste des élèves</h1>
-      <p className="text-lg text-gray-600">
-        Ajoute les prénoms des élèves. Le code de la classe est{" "}
-        <strong className="rounded-xl bg-teal-100 px-2 py-0.5 font-mono text-classe-green">
-          {classe.code}
-        </strong>
-      </p>
+    <div className="animate-fadeIn space-y-6">
+      <div className="rounded-[25px] bg-white p-8 shadow-[0_8px_25px_rgba(0,0,0,0.1)]">
+        <div className="mb-6 flex items-center gap-4">
+          <span className="text-5xl">👥</span>
+          <div>
+            <h1 className="text-4xl font-bold text-classe-purple">
+              Élèves ({eleves?.length ?? 0})
+            </h1>
+            <p className="mt-1 text-lg text-gray-400">
+              Ajoute les prénoms des élèves de ta classe
+            </p>
+          </div>
+        </div>
 
-      <AddEleveForm classeId={classe.id} />
+        <AddEleveForm classeId={classe.id} />
 
-      <div className="rounded-2xl border-2 border-teal-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
-          Élèves ({eleves?.length ?? 0})
-        </h2>
-        <ElevesList eleves={eleves ?? []} classeId={classe.id} />
+        <div className="mt-6">
+          <ElevesList eleves={eleves ?? []} classeId={classe.id} />
+        </div>
       </div>
     </div>
   );

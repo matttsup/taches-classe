@@ -18,7 +18,7 @@ export function AddEleveForm({ classeId }: { classeId: string }) {
     const supabase = createClient();
     const { data: existing } = await supabase
       .from("classe_eleves")
-      .select("id")
+      .select("display_order")
       .eq("classe_id", classeId)
       .order("display_order", { ascending: false })
       .limit(1)
@@ -44,30 +44,21 @@ export function AddEleveForm({ classeId }: { classeId: string }) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-wrap items-end gap-4 rounded-2xl border-2 border-teal-200 bg-white p-5 shadow-sm"
-    >
-      <div className="min-w-[200px] flex-1">
-        <label htmlFor="eleve-name" className="block text-base font-semibold text-gray-700">
-          Ajouter un élève
-        </label>
-        <input
-          id="eleve-name"
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Prénom"
-          required
-          className="mt-2 block w-full rounded-xl border-2 border-gray-300 px-4 py-3 text-base focus:border-classe-green focus:outline-none focus:ring-2 focus:ring-classe-green/30"
-        />
-      </div>
+    <form onSubmit={handleSubmit} className="flex flex-wrap items-center gap-3">
+      <input
+        type="text"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Nouveau prénom"
+        onKeyPress={(e) => e.key === "Enter" && handleSubmit(e)}
+        className="flex-1 rounded-[10px] border-2 border-gray-200 px-4 py-3 text-base font-normal focus:border-classe-teal focus:outline-none"
+      />
       <button
         type="submit"
         disabled={loading}
-        className="rounded-xl bg-classe-green px-5 py-3 text-base font-semibold text-white hover:bg-classe-green/90 disabled:opacity-50"
+        className="rounded-[10px] bg-classe-teal px-5 py-3 font-semibold text-white hover:scale-105 disabled:opacity-50"
       >
-        {loading ? "Ajout..." : "➕ Ajouter"}
+        +
       </button>
       {error && <p className="w-full text-base text-red-600">{error}</p>}
     </form>

@@ -8,6 +8,16 @@ type Eleve = { id: string; name: string };
 type Tache = { id: string; name: string };
 type Assignment = { id: string; assignment_date: string; eleve_id: string; tache_id: string };
 
+const TACHE_COLORS = [
+  "#FF6B9D",
+  "#4ECDC4",
+  "#FFD93D",
+  "#95E1D3",
+  "#A8E6CF",
+  "#FF8B94",
+  "#C7CEEA",
+];
+
 function formatDate(d: Date): string {
   return d.toISOString().split("T")[0];
 }
@@ -15,6 +25,24 @@ function formatDate(d: Date): string {
 function toLocalDate(s: string): Date {
   const [y, m, d] = s.split("-").map(Number);
   return new Date(y, m - 1, d);
+}
+
+function getMonthName(date: Date): string {
+  const months = [
+    "Janvier",
+    "Février",
+    "Mars",
+    "Avril",
+    "Mai",
+    "Juin",
+    "Juillet",
+    "Août",
+    "Septembre",
+    "Octobre",
+    "Novembre",
+    "Décembre",
+  ];
+  return months[date.getMonth()];
 }
 
 export function CalendrierView({
@@ -29,16 +57,24 @@ export function CalendrierView({
   assignments: Assignment[];
 }) {
   const router = useRouter();
-  const [selectedDate, setSelectedDate] = useState<string>(() => formatDate(new Date()));
+  const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
 
-  const start = new Date(selectedDate);
-  start.setDate(start.getDate() - start.getDay() + (start.getDay() === 0 ? -6 : 1));
-  const weekDays: string[] = [];
-  for (let i = 0; i < 7; i++) {
-    const d = new Date(start);
-    d.setDate(d.getDate() + i);
-    weekDays.push(formatDate(d));
+  function getWeekDates(offset = 0): Date[] {
+    const today = new Date();
+    today.setDate(today.getDate() + offset * 7);
+    const current = new Date(today);
+    current.setDate(current.getDate() - current.getDay() + 1); // Monday
+
+    const week = [];
+    for (let i = 0; i < 5; i++) {
+      week.push(new Date(current));
+      current.setDate(current.getDate() + 1);
+    }
+    return week;
   }
+
+  const weekDates = getWeekDates(currentWeekOffset);
+  const today = formatDate(new Date());
 
   const getAssignment = (date: string, tacheId: string) =>
     assignments.find((a) => a.assignment_date === date && a.tache_id === tacheId);
@@ -64,32 +100,10 @@ export function CalendrierView({
     router.refresh();
   }
 
-  async function clearAssignment(date: string, tacheId: string) {
-    const existing = getAssignment(date, tacheId);
-    if (!existing) return;
-    setLoading(`${date}-${tacheId}`);
-    const supabase = createClient();
-    await supabase.from("classe_assignments").delete().eq("id", existing.id);
-    setLoading(null);
-    router.refresh();
-  }
-
-  const goPrevWeek = () => {
-    const d = toLocalDate(selectedDate);
-    d.setDate(d.getDate() - 7);
-    setSelectedDate(formatDate(d));
-  };
-  const goNextWeek = () => {
-    const d = toLocalDate(selectedDate);
-    d.setDate(d.getDate() + 7);
-    setSelectedDate(formatDate(d));
-  };
-  const goToday = () => setSelectedDate(formatDate(new Date()));
-
   if (taches.length === 0) {
     return (
-      <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-6 text-lg text-amber-800">
-        <p>
+      <div className="rounded-[25px] bg-gradient-to-br from-classe-yellow to-classe-coral p-8 text-center text-white">
+        <p className="text-xl font-semibold">
           Ajoute d&apos;abord des tâches dans l&apos;onglet Tâches pour pouvoir
           les répartir sur le calendrier.
         </p>
@@ -98,103 +112,98 @@ export function CalendrierView({
   }
 
   return (
-    <div className="overflow-x-auto rounded-2xl border-2 border-teal-200 bg-white shadow-sm">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-gray-200 p-4">
-        <div className="flex flex-wrap gap-2">
+    <div className="rounded-[20px] bg-white p-6 shadow-[0_4px_15px_rgba(0,0,0,0.08)]">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-4 border-b-2 border-gray-100 pb-6">
+        <div className="flex items-center gap-3">
+          <span className="text-3xl">📅</span>
+          <span className="text-3xl font-bold text-classe-purple">
+            {getMonthName(weekDates[0])} {weekDates[0].getFullYear()}
+          </span>
+        </div>
+        <div className="flex gap-3">
           <button
             type="button"
-            onClick={goPrevWeek}
-            className="rounded-xl border-2 border-gray-300 px-4 py-2.5 text-base font-semibold hover:bg-gray-50"
+            onClick={() => setCurrentWeekOffset((o) => o - 1)}
+            className="rounded-[12px] bg-classe-purple px-5 py-3 text-lg font-semibold text-white transition-transform hover:scale-105"
           >
-            ← Semaine précédente
+            ← Précédent
           </button>
           <button
             type="button"
-            onClick={goNextWeek}
-            className="rounded-xl border-2 border-gray-300 px-4 py-2.5 text-base font-semibold hover:bg-gray-50"
+            onClick={() => setCurrentWeekOffset((o) => o + 1)}
+            className="rounded-[12px] bg-classe-purple px-5 py-3 text-lg font-semibold text-white transition-transform hover:scale-105"
           >
-            Semaine suivante →
-          </button>
-          <button
-            type="button"
-            onClick={goToday}
-            className="rounded-xl border-2 border-classe-green bg-classe-green/10 px-4 py-2.5 text-base font-semibold text-classe-green hover:bg-classe-green/20"
-          >
-            Aujourd&apos;hui
+            Suivant →
           </button>
         </div>
       </div>
 
-      <table className="w-full min-w-[600px] border-collapse">
-        <thead>
-          <tr className="border-b-2 border-gray-200 bg-gray-50">
-            <th className="p-3 text-left text-base font-semibold text-gray-700">
-              Tâche
-            </th>
-            {weekDays.map((day) => {
-              const d = toLocalDate(day);
-              const isToday = formatDate(new Date()) === day;
-              return (
-                <th
-                  key={day}
-                  className={`min-w-[130px] border-l border-gray-200 p-3 text-center text-base font-semibold ${
-                    isToday ? "bg-classe-green/15 text-classe-green" : "text-gray-700"
-                  }`}
-                >
-                  <div>{d.toLocaleDateString("fr-FR", { weekday: "short" })}</div>
-                  <div className="text-sm font-normal">
-                    {d.getDate()}/{d.getMonth() + 1}
-                  </div>
-                </th>
-              );
-            })}
-          </tr>
-        </thead>
-        <tbody>
-          {taches.map((tache) => (
-            <tr key={tache.id} className="border-b border-gray-100">
-              <td className="border-r border-gray-100 p-3 text-base font-semibold text-gray-900">
-                {tache.name}
-              </td>
-              {weekDays.map((day) => {
-                const assign = getAssignment(day, tache.id);
-                const key = `${day}-${tache.id}`;
-                const isBusy = loading === key;
-                return (
-                  <td key={key} className="border-l border-gray-100 p-3 align-top">
-                    <select
-                      value={assign?.eleve_id ?? ""}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        if (v) setAssignment(day, tache.id, v);
-                      }}
-                      disabled={isBusy || eleves.length === 0}
-                      className="w-full rounded-xl border-2 border-gray-300 py-2 pl-3 pr-6 text-base focus:border-classe-green focus:outline-none focus:ring-2 focus:ring-classe-green/30 disabled:opacity-50"
-                    >
-                      <option value="">—</option>
-                      {eleves.map((e) => (
-                        <option key={e.id} value={e.id}>
-                          {e.name}
-                        </option>
-                      ))}
-                    </select>
-                    {assign && (
-                      <button
-                        type="button"
-                        onClick={() => clearAssignment(day, tache.id)}
-                        disabled={isBusy}
-                        className="mt-2 block w-full text-sm font-medium text-red-600 hover:underline disabled:opacity-50"
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        {weekDates.map((date, dayIndex) => {
+          const dateKey = formatDate(date);
+          const isToday = dateKey === today;
+
+          return (
+            <div
+              key={dateKey}
+              className={`rounded-[15px] p-4 ${
+                isToday ? "border-3 bg-[#FFF9E3] border-[#FFD93D]" : "bg-gray-50"
+              }`}
+            >
+              <div className="mb-4 border-b-2 border-gray-200 pb-3 text-center">
+                <div className="text-lg font-bold text-classe-purple">
+                  {date.toLocaleDateString("fr-FR", { weekday: "short" })}
+                </div>
+                <div className="text-2xl font-bold text-gray-900">{date.getDate()}</div>
+              </div>
+
+              <div className="space-y-3">
+                {taches.map((tache, tacheIndex) => {
+                  const assign = getAssignment(dateKey, tache.id);
+                  const key = `${dateKey}-${tache.id}`;
+                  const isBusy = loading === key;
+                  const color = TACHE_COLORS[tacheIndex % TACHE_COLORS.length];
+
+                  return (
+                    <div key={tache.id} className="space-y-1">
+                      <div
+                        className="text-xs font-semibold"
+                        style={{ color }}
                       >
-                        Effacer
-                      </button>
-                    )}
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+                        {tache.name}
+                      </div>
+                      <select
+                        value={assign?.eleve_id ?? ""}
+                        onChange={(e) => {
+                          const v = e.target.value;
+                          if (v) setAssignment(dateKey, tache.id, v);
+                        }}
+                        disabled={isBusy || eleves.length === 0}
+                        className={`w-full rounded-[8px] border-2 px-2 py-2 text-xs font-semibold ${
+                          assign?.eleve_id
+                            ? "text-white"
+                            : "bg-white text-gray-700"
+                        }`}
+                        style={{
+                          borderColor: color,
+                          background: assign?.eleve_id ? color : "white",
+                        }}
+                      >
+                        <option value="">Choisir...</option>
+                        {eleves.map((e) => (
+                          <option key={e.id} value={e.id}>
+                            {e.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

@@ -17,23 +17,29 @@ export default async function ClasseTachesPage() {
     .order("name", { ascending: true });
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold text-classe-green">Liste des tâches</h1>
-      <p className="text-lg text-gray-600">
-        Définis les tâches à répartir (balai, chaises, collation…).
-      </p>
+    <div className="animate-fadeIn space-y-6">
+      <div className="rounded-[25px] bg-white p-8 shadow-[0_8px_25px_rgba(0,0,0,0.1)]">
+        <div className="mb-6 flex items-center gap-4">
+          <span className="text-5xl">✓</span>
+          <div>
+            <h1 className="text-4xl font-bold text-classe-purple">
+              Tâches ({taches?.length ?? 0})
+            </h1>
+            <p className="mt-1 text-lg text-gray-400">
+              Définis les tâches à répartir (balai, chaises, collation…)
+            </p>
+          </div>
+        </div>
 
-      {(!taches || taches.length === 0) && (
-        <SeedDefaultTaches classeId={classe.id} />
-      )}
+        {(!taches || taches.length === 0) && (
+          <SeedDefaultTaches classeId={classe.id} />
+        )}
 
-      <AddTacheForm classeId={classe.id} />
+        <AddTacheForm classeId={classe.id} />
 
-      <div className="rounded-2xl border-2 border-teal-200 bg-white p-5 shadow-sm">
-        <h2 className="mb-4 text-xl font-semibold text-gray-900">
-          Tâches ({taches?.length ?? 0})
-        </h2>
-        <TachesList taches={taches ?? []} classeId={classe.id} />
+        <div className="mt-6">
+          <TachesList taches={taches ?? []} classeId={classe.id} />
+        </div>
       </div>
     </div>
   );
