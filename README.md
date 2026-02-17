@@ -15,14 +15,29 @@ cd taches-classe
 npm install
 ```
 
-### 3. Lancer l'application
+### 3. ⚠️ IMPORTANT : Appliquer les migrations Supabase
+
+**Avant de lancer l'application**, vous devez configurer la base de données Supabase :
+
+1. Allez sur https://supabase.com
+2. Ouvrez votre projet
+3. Allez dans **SQL Editor**
+4. Cliquez sur **New Query**
+5. Copiez-collez **tout le contenu** du fichier `supabase/SETUP_COMPLET.sql`
+6. Cliquez sur **Run**
+
+⚠️ **Sans cette étape, l'application affichera une erreur RLS (Row Level Security).**
+
+📖 Pour plus de détails, consultez `MIGRATIONS.md`
+
+### 4. Lancer l'application
 ```bash
 npm run dev
 ```
 
 L'application sera accessible sur http://localhost:3000
 
-✅ **Aucune configuration nécessaire !** Les credentials Supabase sont hardcodés dans le code.
+✅ **Aucune autre configuration nécessaire !** Les credentials Supabase sont hardcodés dans le code.
 
 ## 📦 Déploiement sur Vercel
 
