@@ -46,10 +46,10 @@ export function AddTacheForm({ classeId }: { classeId: string }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-wrap items-end gap-3 rounded-xl border border-teal-200 bg-white p-4 shadow-sm"
+      className="flex flex-wrap items-end gap-4 rounded-2xl border-2 border-teal-200 bg-white p-5 shadow-sm"
     >
       <div className="min-w-[200px] flex-1">
-        <label htmlFor="tache-name" className="block text-sm font-medium text-gray-700">
+        <label htmlFor="tache-name" className="block text-base font-semibold text-gray-700">
           Ajouter une tâche
         </label>
         <input
@@ -59,17 +59,17 @@ export function AddTacheForm({ classeId }: { classeId: string }) {
           onChange={(e) => setName(e.target.value)}
           placeholder="Ex: Ramasser les crayons"
           required
-          className="mt-1 block w-full rounded-lg border border-gray-300 px-3 py-2 focus:border-classe-green focus:outline-none focus:ring-1 focus:ring-classe-green"
+          className="mt-2 block w-full rounded-xl border-2 border-gray-300 px-4 py-3 text-base focus:border-classe-green focus:outline-none focus:ring-2 focus:ring-classe-green/30"
         />
       </div>
       <button
         type="submit"
         disabled={loading}
-        className="rounded-lg bg-classe-green px-4 py-2 font-medium text-white hover:bg-classe-green/90 disabled:opacity-50"
+        className="rounded-xl bg-classe-green px-5 py-3 text-base font-semibold text-white hover:bg-classe-green/90 disabled:opacity-50"
       >
-        {loading ? "Ajout..." : "Ajouter"}
+        {loading ? "Ajout..." : "➕ Ajouter"}
       </button>
-      {error && <p className="w-full text-sm text-red-600">{error}</p>}
+      {error && <p className="w-full text-base text-red-600">{error}</p>}
     </form>
   );
 }

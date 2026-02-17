@@ -1,25 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
-import { getActiveClasse } from "@/lib/classe-active";
+import { getOrCreateFirstClasse, getOrCreateFirstProf } from "@/lib/classe-active";
 import { CalendrierView } from "@/components/classe/CalendrierView";
 
 export default async function ClasseCalendrierPage() {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return null;
-
-  const { data: prof } = await supabase
-    .from("profs")
-    .select("id")
-    .eq("user_id", user.id)
-    .single();
-
-  if (!prof) redirect("/complete-profile");
-
-  const { classe } = await getActiveClasse(supabase, prof.id);
-  if (!classe) redirect("/classe/prof");
+  const prof = await getOrCreateFirstProf(supabase);
+  const { classe } = await getOrCreateFirstClasse(supabase, prof.id);
 
   const { data: eleves } = await supabase
     .from("classe_eleves")
@@ -42,11 +28,11 @@ export default async function ClasseCalendrierPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-classe-green">
+      <h1 className="text-3xl font-bold text-classe-green">
         Calendrier des tâches
       </h1>
-      <p className="text-gray-600">
-        Choisissez un jour et assignez les tâches aux élèves.
+      <p className="text-lg text-gray-600">
+        Choisis un jour et assigne les tâches aux élèves.
       </p>
 
       <CalendrierView

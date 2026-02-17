@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { getActiveClasse } from "@/lib/classe-active";
+import { getActiveClasse, getOrCreateFirstClasse, getOrCreateFirstProf } from "@/lib/classe-active";
 import { ClasseNavbar } from "@/components/classe/ClasseNavbar";
 
 export default async function ClasseProfLayout({
@@ -9,34 +8,12 @@ export default async function ClasseProfLayout({
   children: React.ReactNode;
 }) {
   const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  if (!user) redirect("/login");
-
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("role, name")
-    .eq("user_id", user.id)
-    .single();
-
-  if (!profile || profile.role !== "prof") redirect("/");
-
-  const { data: prof } = await supabase
-    .from("profs")
-    .select("id")
-    .eq("user_id", user.id)
-    .single();
-
-  if (!prof) redirect("/complete-profile");
-
-  const { classe, classes } = await getActiveClasse(supabase, prof.id);
+  const prof = await getOrCreateFirstProf(supabase);
+  const { classe, classes } = await getOrCreateFirstClasse(supabase, prof.id);
 
   return (
     <div className="min-h-screen bg-classe-mint/30">
       <ClasseNavbar
-        userName={profile.name}
         classes={classes}
         activeClasseId={classe?.id ?? null}
       />

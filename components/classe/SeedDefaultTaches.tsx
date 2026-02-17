@@ -34,17 +34,17 @@ export function SeedDefaultTaches({ classeId }: { classeId: string }) {
   }
 
   return (
-    <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
-      <p className="text-sm text-amber-800">
-        Aucune tâche. Chargez une liste par défaut ou ajoutez-les une par une.
+    <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-5">
+      <p className="text-base text-amber-800">
+        Aucune tâche. Charge une liste par défaut ou ajoute-les une par une.
       </p>
       <button
         type="button"
         onClick={handleSeed}
         disabled={loading}
-        className="mt-3 rounded-lg bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-700 disabled:opacity-50"
+        className="mt-4 rounded-xl bg-amber-500 px-5 py-3 text-base font-semibold text-white hover:bg-amber-600 disabled:opacity-50"
       >
-        {loading ? "Chargement..." : "Charger les tâches par défaut"}
+        {loading ? "Chargement..." : "✨ Charger les tâches par défaut"}
       </button>
     </div>
   );

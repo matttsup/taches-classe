@@ -88,9 +88,9 @@ export function CalendrierView({
 
   if (taches.length === 0) {
     return (
-      <div className="rounded-xl bg-amber-50 p-6 text-amber-800">
+      <div className="rounded-2xl border-2 border-amber-200 bg-amber-50 p-6 text-lg text-amber-800">
         <p>
-          Ajoutez d&apos;abord des tâches dans l&apos;onglet Tâches pour pouvoir
+          Ajoute d&apos;abord des tâches dans l&apos;onglet Tâches pour pouvoir
           les répartir sur le calendrier.
         </p>
       </div>
@@ -98,27 +98,27 @@ export function CalendrierView({
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-teal-200 bg-white shadow-sm">
-      <div className="flex items-center justify-between border-b border-gray-200 p-3">
-        <div className="flex gap-2">
+    <div className="overflow-x-auto rounded-2xl border-2 border-teal-200 bg-white shadow-sm">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b-2 border-gray-200 p-4">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={goPrevWeek}
-            className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium hover:bg-gray-50"
+            className="rounded-xl border-2 border-gray-300 px-4 py-2.5 text-base font-semibold hover:bg-gray-50"
           >
-            Semaine précédente
+            ← Semaine précédente
           </button>
           <button
             type="button"
             onClick={goNextWeek}
-            className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium hover:bg-gray-50"
+            className="rounded-xl border-2 border-gray-300 px-4 py-2.5 text-base font-semibold hover:bg-gray-50"
           >
-            Semaine suivante
+            Semaine suivante →
           </button>
           <button
             type="button"
             onClick={goToday}
-            className="rounded-lg border border-classe-green px-3 py-1.5 text-sm font-medium text-classe-green hover:bg-classe-green/10"
+            className="rounded-xl border-2 border-classe-green bg-classe-green/10 px-4 py-2.5 text-base font-semibold text-classe-green hover:bg-classe-green/20"
           >
             Aujourd&apos;hui
           </button>
@@ -127,8 +127,8 @@ export function CalendrierView({
 
       <table className="w-full min-w-[600px] border-collapse">
         <thead>
-          <tr className="border-b border-gray-200 bg-gray-50">
-            <th className="p-2 text-left text-sm font-semibold text-gray-700">
+          <tr className="border-b-2 border-gray-200 bg-gray-50">
+            <th className="p-3 text-left text-base font-semibold text-gray-700">
               Tâche
             </th>
             {weekDays.map((day) => {
@@ -137,12 +137,12 @@ export function CalendrierView({
               return (
                 <th
                   key={day}
-                  className={`min-w-[120px] border-l border-gray-200 p-2 text-center text-sm font-semibold ${
+                  className={`min-w-[130px] border-l border-gray-200 p-3 text-center text-base font-semibold ${
                     isToday ? "bg-classe-green/15 text-classe-green" : "text-gray-700"
                   }`}
                 >
                   <div>{d.toLocaleDateString("fr-FR", { weekday: "short" })}</div>
-                  <div className="text-xs font-normal">
+                  <div className="text-sm font-normal">
                     {d.getDate()}/{d.getMonth() + 1}
                   </div>
                 </th>
@@ -153,7 +153,7 @@ export function CalendrierView({
         <tbody>
           {taches.map((tache) => (
             <tr key={tache.id} className="border-b border-gray-100">
-              <td className="border-r border-gray-100 p-2 font-medium text-gray-900">
+              <td className="border-r border-gray-100 p-3 text-base font-semibold text-gray-900">
                 {tache.name}
               </td>
               {weekDays.map((day) => {
@@ -161,7 +161,7 @@ export function CalendrierView({
                 const key = `${day}-${tache.id}`;
                 const isBusy = loading === key;
                 return (
-                  <td key={key} className="border-l border-gray-100 p-2 align-top">
+                  <td key={key} className="border-l border-gray-100 p-3 align-top">
                     <select
                       value={assign?.eleve_id ?? ""}
                       onChange={(e) => {
@@ -169,7 +169,7 @@ export function CalendrierView({
                         if (v) setAssignment(day, tache.id, v);
                       }}
                       disabled={isBusy || eleves.length === 0}
-                      className="w-full rounded border border-gray-300 py-1.5 pl-2 pr-6 text-sm focus:border-classe-green focus:outline-none focus:ring-1 focus:ring-classe-green disabled:opacity-50"
+                      className="w-full rounded-xl border-2 border-gray-300 py-2 pl-3 pr-6 text-base focus:border-classe-green focus:outline-none focus:ring-2 focus:ring-classe-green/30 disabled:opacity-50"
                     >
                       <option value="">—</option>
                       {eleves.map((e) => (
@@ -183,7 +183,7 @@ export function CalendrierView({
                         type="button"
                         onClick={() => clearAssignment(day, tache.id)}
                         disabled={isBusy}
-                        className="mt-1 block w-full text-xs text-red-600 hover:underline disabled:opacity-50"
+                        className="mt-2 block w-full text-sm font-medium text-red-600 hover:underline disabled:opacity-50"
                       >
                         Effacer
                       </button>
