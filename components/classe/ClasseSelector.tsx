@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 
-type ClasseRow = { id: string; name: string; code: string };
+type ClasseRow = { id: string; name: string };
 
 export function ClasseSelector({
   classes,
@@ -12,13 +12,12 @@ export function ClasseSelector({
   selectedClasseId: string;
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   if (classes.length <= 1) return null;
 
   return (
     <div className="mt-4 flex items-center justify-center gap-3">
-      <label className="text-lg font-semibold text-gray-700">Classe :</label>
+      <label className="text-lg font-semibold text-gray-700">Changer de classe :</label>
       <select
         value={selectedClasseId}
         onChange={(e) => router.push(`/classe/prof?classe=${e.target.value}`)}

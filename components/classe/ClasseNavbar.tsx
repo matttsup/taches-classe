@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 
-type ClasseRow = { id: string; name: string; code: string };
+type ClasseRow = { id: string; name: string };
 
 interface ClasseNavbarProps {
   classes: ClasseRow[];

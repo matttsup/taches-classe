@@ -1,6 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 
-export type ClasseRow = { id: string; name: string; code: string };
+export type ClasseRow = { id: string; name: string };
 
 export async function getActiveClasse(
   supabase: SupabaseClient,
@@ -8,7 +8,7 @@ export async function getActiveClasse(
 ): Promise<{ classe: ClasseRow | null; classes: ClasseRow[] }> {
   const { data: classes } = await supabase
     .from("classes")
-    .select("id, name, code")
+    .select("id, name")
     .eq("prof_id", profId)
     .order("created_at", { ascending: true });
 
@@ -46,11 +46,10 @@ export async function getOrCreateFirstClasse(
   const { classe, classes } = await getActiveClasse(supabase, profId);
   if (classe) return { classe, classes };
 
-  const code = Math.random().toString(36).slice(2, 8).toUpperCase();
   const { data: created, error } = await supabase
     .from("classes")
-    .insert({ prof_id: profId, name: "Ma classe", code })
-    .select("id, name, code")
+    .insert({ prof_id: profId, name: "501" })
+    .select("id, name")
     .single();
 
   if (error || !created) throw new Error("Impossible de créer la classe");

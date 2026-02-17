@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server";
-import { cookies } from "next/headers";
 import Link from "next/link";
 import { getActiveClasse, getOrCreateFirstProf } from "@/lib/classe-active";
 import { ClasseSelector } from "@/components/classe/ClasseSelector";
@@ -83,13 +82,10 @@ export default async function ClasseProfDashboardPage({
         <h1 className="mb-3 text-[42px] font-bold text-classe-purple">
           École Chanoine-Joseph-Théorêt
         </h1>
+        <div className="mb-4 text-2xl font-semibold text-gray-700">
+          Classe en cours : <span className="text-classe-teal">{selectedClasse.name}</span>
+        </div>
         <ClasseSelector classes={classes} selectedClasseId={selectedClasse.id} />
-        <p className="mt-4 text-xl text-gray-600">
-          Code de la classe :{" "}
-          <strong className="rounded-xl bg-classe-teal/20 px-4 py-2 font-mono text-2xl text-classe-teal">
-            {selectedClasse.code}
-          </strong>
-        </p>
         <Link
           href="/classe/prof/classes"
           className="mt-6 inline-block rounded-[15px] bg-classe-purple/10 px-5 py-2 text-sm font-semibold text-classe-purple transition-transform hover:scale-105"
